@@ -2,6 +2,7 @@
 import pygame
 import random
 import time
+import math
 from array import *
  
 pygame.font.init()
@@ -15,7 +16,9 @@ normal_font = pygame.font.SysFont(None, normal_font_size)
 huge_font_size = 80
 huge_font = pygame.font.SysFont(None, huge_font_size)
 
+start_time = time.time()
 
+game_won = False
 
 # size of screen and blocks
 block_size = 64
@@ -136,6 +139,7 @@ def get_random_element():
 
 # define a main function
 def main():
+    global game_won
      
     # initialize the pygame module
     pygame.init()
@@ -179,10 +183,20 @@ def main():
 
         if(len(elements) > 0):
             draw_grid(screen)
-        else:
-            win = huge_font.render("Alles richtig!", True, (10,200,10))
-            text_rect = win.get_rect(center=(s_width / 2, s_height / 2))
+        elif not game_won:
+            game_won = True
+            win_text = "Alles richtig!"
+            win = huge_font.render(win_text, True, (10,200,10))
+            text_rect = win.get_rect(center=(s_width / 2, s_height / 2 - 55))
             screen.blit(win, text_rect)
+
+            current_time = time.time()
+            time_diff = math.trunc(current_time - start_time)
+            time_text = "Zeit: {time_diff} Sekunden".format(time_diff = time_diff)
+            timer = huge_font.render(time_text, True, (10,200,10))
+            text_rect = timer.get_rect(center=(s_width / 2, s_height / 2 + 55))
+            screen.blit(timer, text_rect)
+
             pygame.display.update()
 
 
@@ -203,10 +217,18 @@ def draw_grid(surface):
         text_rect = y_coord.get_rect(center=(0.5 * block_size, s_height - (y + 1.5) * block_size))
         surface.blit(y_coord, text_rect)
 
+    current_time = time.time()
+    time_diff = math.trunc(current_time - start_time)
+
+    timer = normal_font.render(str(time_diff), True, coord_color)
+    text_rect = timer.get_rect(center=((columns + 0.5) * block_size, 0.5 * block_size))
+    surface.blit(timer, text_rect)
+
     for x in range(columns):
         for y in range(rows):
             if grid[x][y] is not None:
                 grid[x][y].draw(surface,x,y)
+
 
     pygame.display.update()
 
